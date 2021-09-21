@@ -25,10 +25,22 @@ class LoginActivity : AppCompatActivity(){
                 // Pasar al activity main
                 val intent : Intent = Intent()
                 intent.setClass(this, MainActivity::class.java)
+
+                val bundle : Bundle = Bundle()
+                bundle.putString("username", eteUsername.text.toString())
+
+                intent.putExtra("data",bundle)
+
                 startActivity(intent)
             }else {
                 Toast.makeText(this, "Error en login", Toast.LENGTH_LONG).show()
             }
+        }
+
+        val butSignup : Button = findViewById(R.id.butSignup)
+        butSignup.setOnClickListener { _ : View ->
+            val intent : Intent = Intent(this, SignupActivity::class.java)
+            startActivity(intent)
         }
 
     }
