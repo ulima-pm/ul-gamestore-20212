@@ -40,8 +40,27 @@ class LoginActivity : AppCompatActivity(){
         val butSignup : Button = findViewById(R.id.butSignup)
         butSignup.setOnClickListener { _ : View ->
             val intent : Intent = Intent(this, SignupActivity::class.java)
-            startActivity(intent)
+            startActivityForResult(intent, 10)
         }
+    }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 10) {
+            // Caso signup
+            if (resultCode == RESULT_OK) {
+                // Registro exitoso
+                val username = data?.getBundleExtra("signup_data")?.getString("username")
+                val password = data?.getBundleExtra("signup_data")?.getString("password")
+
+                eteUsername.setText(username)
+                etePassword.setText(password)
+            } else {
+                eteUsername.setText("")
+                etePassword.setText("")
+
+            }
+        }
     }
 }
