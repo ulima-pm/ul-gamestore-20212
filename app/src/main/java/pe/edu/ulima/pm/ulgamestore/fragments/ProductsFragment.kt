@@ -14,7 +14,6 @@ class ProductsFragment(val activity : MainActivity) : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        activity.metodoCualquiera()
         return inflater.inflate(R.layout.fragment_products, container, false)
     }
 }

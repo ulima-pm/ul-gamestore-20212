@@ -3,6 +3,7 @@ package pe.edu.ulima.pm.ulgamestore
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
+import pe.edu.ulima.pm.ulgamestore.fragments.AccountFragment
 import pe.edu.ulima.pm.ulgamestore.fragments.ProductsFragment
 
 class MainActivity : AppCompatActivity() {
@@ -18,7 +19,19 @@ class MainActivity : AppCompatActivity() {
         ft.commit()
     }
 
-    fun metodoCualquiera() {
+    fun changeProductsFragment() {
+        val fragment = ProductsFragment(this)
+        val ft = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.flaContent,fragment)
 
+        ft.commit()
+    }
+
+    fun changeAccountFragment() {
+        val fragment = AccountFragment(this)
+        val ft = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.flaContent, fragment)
+
+        ft.commit()
     }
 }

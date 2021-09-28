@@ -5,9 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import pe.edu.ulima.pm.ulgamestore.MainActivity
 import pe.edu.ulima.pm.ulgamestore.R
 
-class AccountFragment : Fragment(){
+class AccountFragment(val activity : MainActivity) : Fragment(){
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
