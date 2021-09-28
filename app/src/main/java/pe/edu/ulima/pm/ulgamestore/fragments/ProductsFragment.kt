@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import pe.edu.ulima.pm.ulgamestore.MainActivity
 import pe.edu.ulima.pm.ulgamestore.R
 
-class ProductsFragment(val activity : MainActivity) : Fragment() {
+class ProductsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
