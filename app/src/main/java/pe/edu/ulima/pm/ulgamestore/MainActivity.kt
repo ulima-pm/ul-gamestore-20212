@@ -3,6 +3,7 @@ package pe.edu.ulima.pm.ulgamestore
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -30,7 +31,6 @@ class MainActivity : AppCompatActivity(), BottomBarFragment.OnMenuClicked {
         actionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Configurando NavigationView
-
         val nviMain = findViewById<NavigationView>(R.id.nviMain)
         dlaMain = findViewById<DrawerLayout>(R.id.dlaMain)
 

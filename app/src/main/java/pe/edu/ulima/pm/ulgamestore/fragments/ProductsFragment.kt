@@ -1,6 +1,7 @@
 package pe.edu.ulima.pm.ulgamestore.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import pe.edu.ulima.pm.ulgamestore.MainActivity
 import pe.edu.ulima.pm.ulgamestore.R
 import pe.edu.ulima.pm.ulgamestore.adapter.ProductsListAdapter
 import pe.edu.ulima.pm.ulgamestore.model.ProductsManager
+import pe.edu.ulima.pm.ulgamestore.model.Videogame
 
 class ProductsFragment : Fragment() {
     override fun onCreateView(
@@ -24,7 +26,10 @@ class ProductsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val rviProducts = view.findViewById<RecyclerView>(R.id.rviProducts)
-        rviProducts.adapter = ProductsListAdapter(ProductsManager().getProducts())
-
+        rviProducts.adapter = ProductsListAdapter(
+            ProductsManager().getProducts()
+        ) { product: Videogame ->
+            Log.i("ProductsFragment", product.name)
+        }
     }
 }
