@@ -1,5 +1,6 @@
 package pe.edu.ulima.pm.ulgamestore.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,6 +15,16 @@ import pe.edu.ulima.pm.ulgamestore.model.ProductsManager
 import pe.edu.ulima.pm.ulgamestore.model.Videogame
 
 class ProductsFragment : Fragment() {
+    interface OnProductSelectedListener {
+        fun onSelect(videogame : Videogame)
+    }
+    private var listener : OnProductSelectedListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = context as OnProductSelectedListener
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -27,9 +38,11 @@ class ProductsFragment : Fragment() {
 
         val rviProducts = view.findViewById<RecyclerView>(R.id.rviProducts)
         rviProducts.adapter = ProductsListAdapter(
-            ProductsManager().getProducts()
+            ProductsManager().getProducts(),
+            this
         ) { product: Videogame ->
             Log.i("ProductsFragment", product.name)
+            listener?.onSelect(product)
         }
     }
 }

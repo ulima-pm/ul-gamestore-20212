@@ -5,12 +5,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import pe.edu.ulima.pm.ulgamestore.R
 import pe.edu.ulima.pm.ulgamestore.model.Videogame
 
 class ProductsListAdapter(
         private val productsList : List<Videogame>,
+        private val fragment : Fragment,
         private val listener : (Videogame) -> Unit) :
     RecyclerView.Adapter<ProductsListAdapter.ViewHolder>(){
 
@@ -45,6 +48,10 @@ class ProductsListAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.tviProductName.text = productsList[position].name
         holder.tviProductPrice.text = productsList[position].price.toString()
+        Glide.with(fragment)
+            .load(productsList[position].url)
+            .fitCenter()
+            .into(holder.iviProductImage)
     }
 
     override fun getItemCount(): Int {

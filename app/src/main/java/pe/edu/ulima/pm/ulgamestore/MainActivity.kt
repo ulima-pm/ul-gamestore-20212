@@ -11,9 +11,12 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 import pe.edu.ulima.pm.ulgamestore.fragments.AccountFragment
 import pe.edu.ulima.pm.ulgamestore.fragments.BottomBarFragment
+import pe.edu.ulima.pm.ulgamestore.fragments.ProductDetailFragment
 import pe.edu.ulima.pm.ulgamestore.fragments.ProductsFragment
+import pe.edu.ulima.pm.ulgamestore.model.Videogame
 
-class MainActivity : AppCompatActivity(), BottomBarFragment.OnMenuClicked {
+class MainActivity : AppCompatActivity(), BottomBarFragment.OnMenuClicked,
+        ProductsFragment.OnProductSelectedListener {
 
     private val fragments = mutableListOf<Fragment>()
     private lateinit var dlaMain : DrawerLayout
@@ -24,6 +27,7 @@ class MainActivity : AppCompatActivity(), BottomBarFragment.OnMenuClicked {
 
         fragments.add(ProductsFragment())
         fragments.add(AccountFragment())
+        fragments.add(ProductDetailFragment())
 
         // Configurando menu hamburguesa
         val actionBar = supportActionBar
@@ -77,11 +81,23 @@ class MainActivity : AppCompatActivity(), BottomBarFragment.OnMenuClicked {
         ft.commit()
     }
 
+    private fun changeProductDetailFragment(product : Videogame) {
+        val fragment = fragments[2]
+        val ft = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.flaContent, fragment)
+
+        ft.commit()
+    }
+
     override fun onClick(menuName: String) {
         if (menuName == "products") {
             changeProductsFragment()
         }else if (menuName == "account"){
             changeAccountFragment()
         }
+    }
+
+    override fun onSelect(videogame: Videogame) {
+        changeProductDetailFragment(videogame)
     }
 }
