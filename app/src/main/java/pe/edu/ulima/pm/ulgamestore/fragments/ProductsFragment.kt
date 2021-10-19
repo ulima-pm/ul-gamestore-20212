@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import pe.edu.ulima.pm.ulgamestore.MainActivity
@@ -36,13 +37,19 @@ class ProductsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val rviProducts = view.findViewById<RecyclerView>(R.id.rviProducts)
-        rviProducts.adapter = ProductsListAdapter(
-            ProductsManager().getProducts(),
-            this
-        ) { product: Videogame ->
-            Log.i("ProductsFragment", product.name)
-            listener?.onSelect(product)
-        }
+        ProductsManager().getProducts({vgList : List<Videogame> ->
+            val rviProducts = view.findViewById<RecyclerView>(R.id.rviProducts)
+            rviProducts.adapter = ProductsListAdapter(
+                vgList,
+                this
+            ) { product: Videogame ->
+                Log.i("ProductsFragment", product.name)
+                listener?.onSelect(product)
+            }
+        }, { error ->
+            Toast.makeText(activity, "Error: " + error, Toast.LENGTH_SHORT).show()
+        })
+
+
     }
 }

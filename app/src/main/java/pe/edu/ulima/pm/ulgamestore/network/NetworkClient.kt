@@ -13,6 +13,7 @@ class NetworkClient(var url : String) {
 
     // thread-safe
     fun download(callbackOK : (String) -> Unit, callbackError : (String) -> Unit) {
+
         Thread() {
             val urlConn = URL(url)
             val conn = urlConn.openConnection() as HttpURLConnection
