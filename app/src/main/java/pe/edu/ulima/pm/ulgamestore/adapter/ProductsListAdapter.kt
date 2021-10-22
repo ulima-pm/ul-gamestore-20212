@@ -46,8 +46,8 @@ class ProductsListAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.tviProductName.text = productsList[position].name
-        holder.tviProductPrice.text = productsList[position].price.toString()
+        holder.tviProductName.text = productsList[position].nombre
+        holder.tviProductPrice.text = productsList[position].precio.toString()
         Glide.with(fragment)
             .load(productsList[position].url)
             .fitCenter()
