@@ -3,12 +3,18 @@ package pe.edu.ulima.pm.ulgamestore
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.gson.Gson
+import java.io.FileNotFoundException
+import java.nio.charset.Charset
 import java.util.*
+
+data class LoginInfo(val username: String, val loginDate : Long)
 
 class LoginActivity : AppCompatActivity(){
     private lateinit var eteUsername : EditText
@@ -18,7 +24,7 @@ class LoginActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        if (isLogued()) {
+        if (isLoguedAI()) {
             val sp = getSharedPreferences("LOGIN_INFO", Context.MODE_PRIVATE)
             val username = sp.getString("LOGIN_USERNAME", "")
             changeActivity(username!!)
@@ -31,7 +37,8 @@ class LoginActivity : AppCompatActivity(){
         butLogin.setOnClickListener{ _ : View ->
             if (eteUsername.text.toString() == "pm" && etePassword.text.toString() == "123") {
 
-                almacenarInfoLogin(eteUsername.text.toString())
+                //almacenarInfoLogin(eteUsername.text.toString())
+                almacenarInfoLoginAI(eteUsername.text.toString())
                 changeActivity(eteUsername.text.toString())
 
             }else {
@@ -62,11 +69,36 @@ class LoginActivity : AppCompatActivity(){
 
     }
 
+    private fun isLoguedAI(): Boolean {
+        var cadena : String = ""
+        try {
+            openFileInput("login_info.json").use {
+                val byteArray = it.readBytes()
+                cadena = String(byteArray)
+                Log.i("LoginActivity", cadena);
+            }
+        }catch (fnfe : FileNotFoundException) {
+            return false;
+        }
+
+        //val loginInfo = Gson().fromJson(cadena, LoginInfo::class.java)
+        return true
+    }
+
     private fun almacenarInfoLogin(username : String) {
         val editor = getSharedPreferences("LOGIN_INFO", Context.MODE_PRIVATE).edit()
         editor.putString("LOGIN_USERNAME", username)
         editor.putLong("LOGIN_DATE", Date().time)
         editor.commit()
+    }
+
+    private fun almacenarInfoLoginAI(username : String) {
+        val gson = Gson()
+        val loginInfo = LoginInfo(username, Date().time)
+        val loginInfoSerializado = gson.toJson(loginInfo)
+        openFileOutput("login_info.json", Context.MODE_PRIVATE).use {
+            it.write(loginInfoSerializado.toByteArray(Charsets.UTF_8))
+        }
     }
 
     private fun changeActivity(username : String) {
