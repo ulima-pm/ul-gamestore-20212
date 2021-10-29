@@ -1,8 +1,12 @@
 package pe.edu.ulima.pm.ulgamestore
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -11,6 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import java.io.FileNotFoundException
+import java.io.PrintWriter
 import java.nio.charset.Charset
 import java.util.*
 
@@ -25,9 +30,9 @@ class LoginActivity : AppCompatActivity(){
         setContentView(R.layout.activity_login)
 
         if (isLoguedAI()) {
-            val sp = getSharedPreferences("LOGIN_INFO", Context.MODE_PRIVATE)
-            val username = sp.getString("LOGIN_USERNAME", "")
-            changeActivity(username!!)
+            val username = getLoginUsernameAI()
+
+            changeActivity(username)
         }
 
         eteUsername = findViewById(R.id.eteUsername)
@@ -85,6 +90,27 @@ class LoginActivity : AppCompatActivity(){
         return true
     }
 
+    fun getLoginUsername() : String {
+        val sp = getSharedPreferences("LOGIN_INFO", Context.MODE_PRIVATE)
+        val username = sp.getString("LOGIN_USERNAME", "")!!
+        return username
+    }
+
+    fun getLoginUsernameAI() : String {
+        var cadena : String = ""
+        try {
+            openFileInput("login_info.json").use {
+                val byteArray = it.readBytes()
+                cadena = String(byteArray)
+            }
+        }catch (fnfe : FileNotFoundException) {
+            return ""
+        }
+
+        val loginInfo = Gson().fromJson(cadena, LoginInfo::class.java)
+        return loginInfo.username
+    }
+
     private fun almacenarInfoLogin(username : String) {
         val editor = getSharedPreferences("LOGIN_INFO", Context.MODE_PRIVATE).edit()
         editor.putString("LOGIN_USERNAME", username)
@@ -98,6 +124,39 @@ class LoginActivity : AppCompatActivity(){
         val loginInfoSerializado = gson.toJson(loginInfo)
         openFileOutput("login_info.json", Context.MODE_PRIVATE).use {
             it.write(loginInfoSerializado.toByteArray(Charsets.UTF_8))
+        }
+    }
+
+    private fun almacenarInfoLoginAE(username: String) {
+        val gson = Gson()
+        val loginInfo = LoginInfo(username, Date().time)
+        val loginInfoSerializado = gson.toJson(loginInfo)
+
+        // Verificamos si tenemos acceso al AE
+        if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
+
+            if (Build.VERSION.SDK_INT < 29) {
+                val rutaFolderDocumentos = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOCUMENTS).absolutePath
+                val archivo = "$rutaFolderDocumentos/login_info.json"
+                PrintWriter(archivo).use {
+                    it.println(loginInfoSerializado)
+                }
+            }else {
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.RELATIVE_PATH,
+                        Environment.DIRECTORY_DOCUMENTS + "/login_info.json")
+                    put(MediaStore.MediaColumns.MIME_TYPE, "application/json")
+                }
+
+                val uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)!!
+
+                contentResolver.openOutputStream(uri).use {
+                    it?.write(loginInfoSerializado.toByteArray(Charsets.UTF_8))
+                }
+            }
+
+
         }
     }
 
