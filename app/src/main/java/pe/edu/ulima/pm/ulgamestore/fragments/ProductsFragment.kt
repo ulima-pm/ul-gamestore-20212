@@ -37,7 +37,7 @@ class ProductsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        ProductsManager(requireActivity().applicationContext).getProductsByRoom({vgList : List<Videogame> ->
+        ProductsManager(requireActivity().applicationContext).getProductsFirebase({vgList : List<Videogame> ->
             val rviProducts = view.findViewById<RecyclerView>(R.id.rviProducts)
             rviProducts.adapter = ProductsListAdapter(
                 vgList,
@@ -46,6 +46,7 @@ class ProductsFragment : Fragment() {
                 listener?.onSelect(product)
             }
         }, { error ->
+            Log.e("ProducsFragment", error)
             Toast.makeText(activity, "Error: " + error, Toast.LENGTH_SHORT).show()
         })
 

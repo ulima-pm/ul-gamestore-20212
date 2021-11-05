@@ -11,7 +11,7 @@ data class Videogame(
     @ColumnInfo(name = "nombre")
     val nombre : String,
     @ColumnInfo(name = "categoria")
-    val categoria : Int,
+    val categoria : Long,
     @ColumnInfo(name = "consolas")
     val consolas : String,
     @ColumnInfo(name = "desarrollador")

@@ -5,6 +5,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.os.HandlerCompat
 import androidx.room.Room
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
@@ -90,21 +91,24 @@ class ProductsManager(context : Context) {
             .addOnSuccessListener { res ->
                 val products = arrayListOf<Videogame>()
                 for (document in res) {
+                    println()
                     val vg = Videogame(
                         document.id.toLong(),
                         document.data["nombre"]!! as String,
-                        1,
+                        (document.data["categoria"]!! as DocumentReference).id.toLong(),
                         document.data["consolas"]!! as String,
                         document.data["desarrollador"]!! as String,
-                        document.data["ranking"]!! as Float,
-                        document.data["precio"]!! as Float,
+                        (document.data["ranking"]!! as Double).toFloat(),
+                        (document.data["precio"]!! as Long).toFloat(),
                         document.data["url"]!! as String
                     )
                     products.add(vg)
                 }
                 callbackOK(products)
             }
-            .addOnFailureListener {  }
+            .addOnFailureListener {
+                callbackError(it.message!!)
+            }
     }
 
     private fun saveIntoRoom(videogames: List<Videogame>) {
