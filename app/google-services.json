@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "368209312879",
+    "project_id": "pm-20212",
+    "storage_bucket": "pm-20212.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:368209312879:android:19ebfb588baf2bf40e219a",
+        "android_client_info": {
+          "package_name": "pe.edu.ulima.pm.ulgamestore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "368209312879-jv8lbc8jb7l837tvgrrtp61gec7gjedc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2i1PSbkOF0af68jb6lAoqgpnS23LvJLs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "368209312879-jv8lbc8jb7l837tvgrrtp61gec7gjedc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

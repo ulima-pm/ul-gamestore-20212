@@ -5,6 +5,8 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.os.HandlerCompat
 import androidx.room.Room
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import pe.edu.ulima.pm.ulgamestore.network.APIVideogamesService
@@ -21,6 +23,8 @@ class ProductsManager(context : Context) {
 
     private val db = Room.databaseBuilder(context,
             VGAppDatabase::class.java, "db_videogames").allowMainThreadQueries().build()
+
+    private val dbFirebase = Firebase.firestore
 
     val API_URL = "https://script.google.com/macros/s/AKfycbxA2iW6e4f8IMlrIHIG_s1aRYDZDkhuKX1oKFARFFGe1du3fDM/"
 
@@ -78,6 +82,29 @@ class ProductsManager(context : Context) {
     fun getProductsByRoom(callbackOK : (List<Videogame>) -> Unit, callbackError : (String) -> Unit) {
         val videogames : List<Videogame> = db.videogameDAO().findAll()
         callbackOK(videogames)
+    }
+
+    fun getProductsFirebase(callbackOK : (List<Videogame>) -> Unit, callbackError : (String) -> Unit) {
+        dbFirebase.collection("videogames")
+            .get()
+            .addOnSuccessListener { res ->
+                val products = arrayListOf<Videogame>()
+                for (document in res) {
+                    val vg = Videogame(
+                        document.id.toLong(),
+                        document.data["nombre"]!! as String,
+                        1,
+                        document.data["consolas"]!! as String,
+                        document.data["desarrollador"]!! as String,
+                        document.data["ranking"]!! as Float,
+                        document.data["precio"]!! as Float,
+                        document.data["url"]!! as String
+                    )
+                    products.add(vg)
+                }
+                callbackOK(products)
+            }
+            .addOnFailureListener {  }
     }
 
     private fun saveIntoRoom(videogames: List<Videogame>) {
