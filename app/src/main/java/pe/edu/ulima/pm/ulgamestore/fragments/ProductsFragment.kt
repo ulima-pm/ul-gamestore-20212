@@ -1,5 +1,7 @@
 package pe.edu.ulima.pm.ulgamestore.fragments
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -8,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -66,6 +69,13 @@ class ProductsFragment : Fragment() {
         val permission = ContextCompat.checkSelfPermission(
             requireActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)
 
+        val requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { habilitado ->
+                if (habilitado) {
+                    getLocation()
+                }
+            }
+
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // No hay permisos
             val noPodemosPedirPermisos = ActivityCompat.shouldShowRequestPermissionRationale(
@@ -83,15 +93,21 @@ class ProductsFragment : Fragment() {
                         android.Manifest.permission.ACCESS_FINE_LOCATION),
                     100
                 )
+                requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
             }
         }else {
-            // Ya tenemos permisos, podemos obtener localizacion
-            fusedLocationClient.lastLocation.addOnSuccessListener {
-                Log.d("ProductsFragment", "${it.latitude} , ${it.longitude}")
-            }
-            fusedLocationClient.lastLocation.addOnFailureListener {
-                Log.e("ProductsFragment", it.message!!)
-            }
+            getLocation()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getLocation() {
+        // Ya tenemos permisos, podemos obtener localizacion
+        fusedLocationClient.lastLocation.addOnSuccessListener {
+            Log.d("ProductsFragment", "${it.latitude} , ${it.longitude}")
+        }
+        fusedLocationClient.lastLocation.addOnFailureListener {
+            Log.e("ProductsFragment", it.message!!)
         }
     }
 
