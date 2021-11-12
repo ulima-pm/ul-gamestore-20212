@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,8 +16,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import pe.edu.ulima.pm.ulgamestore.MainActivity
 import pe.edu.ulima.pm.ulgamestore.R
 import pe.edu.ulima.pm.ulgamestore.adapter.ProductsListAdapter
@@ -29,6 +29,7 @@ class ProductsFragment : Fragment() {
     }
     private var listener : OnProductSelectedListener? = null
     private lateinit var fusedLocationClient : FusedLocationProviderClient
+    private lateinit var locationCallback: LocationCallback
 
 
     override fun onAttach(context: Context) {
@@ -86,23 +87,32 @@ class ProductsFragment : Fragment() {
                 Toast.makeText(requireActivity(),
                     "Habilitar permisos manualmente", Toast.LENGTH_SHORT).show()
             }else {
-                ActivityCompat.requestPermissions(
-                    requireActivity(),
-                    arrayOf(
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION ,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION),
-                    100
-                )
-                requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+//                requestPermissions(
+//                    arrayOf(
+//                        android.Manifest.permission.ACCESS_COARSE_LOCATION ,
+//                        android.Manifest.permission.ACCESS_FINE_LOCATION),
+//                    100
+//                )
+
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
         }else {
             getLocation()
         }
     }
 
+//    override fun onRequestPermissionsResult(
+//        requestCode: Int,
+//        permissions: Array<out String>,
+//        grantResults: IntArray
+//    ) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//        getLocation()
+//    }
+
     @SuppressLint("MissingPermission")
     private fun getLocation() {
-        // Ya tenemos permisos, podemos obtener localizacion
+        // Obtener ultima localizacion
         fusedLocationClient.lastLocation.addOnSuccessListener {
             Log.d("ProductsFragment", "${it.latitude} , ${it.longitude}")
         }
@@ -111,5 +121,47 @@ class ProductsFragment : Fragment() {
         }
     }
 
+    @SuppressLint("MissingPermission")
+    fun startLocationUpdates() {
+        locationCallback = object  : LocationCallback() {
+            override fun onLocationResult(locationResult : LocationResult?){
+                if (locationResult != null) {
+                    for (location in locationResult.locations) {
+                        Log.d("ProductsFragment",
+                            "${location.latitude} , ${location.longitude}")
+                    }
+                }
+            }
+        }
+
+        // Configurar para obtener localizacion mas actualizadas
+        fusedLocationClient.requestLocationUpdates(
+            createLocationRequest(),
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+    fun createLocationRequest() : LocationRequest {
+        val locationRequest = LocationRequest.create().apply {
+            this.interval = 5000
+            this.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+        return locationRequest
+    }
+
+    fun stopLocationUpdates(locationCallback: LocationCallback) {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopLocationUpdates(locationCallback)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startLocationUpdates()
+    }
 
 }
