@@ -34,7 +34,7 @@
         </activity>
         <activity android:name=".SignupActivity"></activity>
         <provider
-            android:authorities="pe.edu.ulima.fileprovider"
+            android:authorities="pe.edu.ulima.ulgamestore.fileprovider"
             android:name="androidx.core.content.FileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
