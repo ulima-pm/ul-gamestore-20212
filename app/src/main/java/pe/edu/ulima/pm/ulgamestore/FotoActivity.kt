@@ -2,8 +2,11 @@ package pe.edu.ulima.pm.ulgamestore
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
@@ -32,6 +35,12 @@ class FotoActivity : AppCompatActivity() {
         findViewById<Button>(R.id.butTomarFoto).setOnClickListener {
             takePhoto()
         }
+
+        photoPath = getPreferences(MODE_PRIVATE).getString("PHOTO_PATH", "")
+        if (photoPath != "") {
+            showPhoto()
+        }
+
     }
 
     fun showCamera() {
@@ -78,6 +87,10 @@ class FotoActivity : AppCompatActivity() {
     }
 
     private fun showPhoto() {
+        val matrix = Matrix()
+        val angle = getRotateAngle()
+        matrix.postRotate(angle)
+
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
 
@@ -86,13 +99,32 @@ class FotoActivity : AppCompatActivity() {
         val iviHeight = iviFoto.height
         val iviWidth = iviFoto.width
 
-        val scaleFactor = Math.min(iviWidth / options.outWidth, iviHeight / options.outHeight)
+        var scaleFactor = 1
+        if (angle == 90f || angle == 270f)
+            scaleFactor = Math.min(iviWidth / options.outHeight, iviHeight / options.outWidth)
+        else
+            scaleFactor = Math.min(iviWidth / options.outWidth, iviHeight / options.outHeight)
+
 
         options.inJustDecodeBounds = false
         options.inSampleSize = scaleFactor
         val bitmap = BitmapFactory.decodeFile(photoPath, options)
-        iviFoto.setImageBitmap(bitmap)
+        val bitmapRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
 
+        iviFoto.setImageBitmap(bitmapRotated)
+    }
+
+    private fun getRotateAngle() : Float{
+        val exifInterface = ExifInterface(photoPath!!)
+        val orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_UNDEFINED)
+        if (orientation == ExifInterface.ORIENTATION_ROTATE_90)
+            return 90f
+        if (orientation == ExifInterface.ORIENTATION_ROTATE_180)
+            return 180f
+        if (orientation == ExifInterface.ORIENTATION_ROTATE_270)
+            return 270f
+        return 0f
     }
 
     @Throws(IOException::class)
@@ -105,5 +137,11 @@ class FotoActivity : AppCompatActivity() {
         )
         photoPath = imageFile.absolutePath
         return imageFile
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        Log.d("FotoActivity", "onConfigurationChanged")
+        getPreferences(MODE_PRIVATE ).edit().putString("PHOTO_PATH", photoPath!!).commit()
     }
 }

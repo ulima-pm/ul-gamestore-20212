@@ -21,7 +21,8 @@
         android:theme="@style/Theme.ULGameStore">
         <activity
             android:name=".FotoActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:configChanges="orientation|screenSize"/>
         <activity android:name=".MainActivity"></activity>
         <activity
             android:name=".LoginActivity"
