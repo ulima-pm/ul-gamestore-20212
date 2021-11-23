@@ -1,7 +1,13 @@
 package pe.edu.ulima.pm.ulgamestore
 
+import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -16,14 +22,18 @@ import pe.edu.ulima.pm.ulgamestore.fragments.ProductsFragment
 import pe.edu.ulima.pm.ulgamestore.model.Videogame
 
 class MainActivity : AppCompatActivity(), BottomBarFragment.OnMenuClicked,
-        ProductsFragment.OnProductSelectedListener {
+        ProductsFragment.OnProductSelectedListener, SensorEventListener {
 
     private val fragments = mutableListOf<Fragment>()
     private lateinit var dlaMain : DrawerLayout
+    private lateinit var sensorManager : SensorManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
 
         fragments.add(ProductsFragment())
         fragments.add(AccountFragment())
@@ -55,6 +65,39 @@ class MainActivity : AppCompatActivity(), BottomBarFragment.OnMenuClicked,
 
         ft.commit()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        showTiltData()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        sensorManager.unregisterListener(this)
+    }
+
+    private fun showTiltData() {
+        val sensor = getSensor("android.sensor.tilt_detector")
+        if (sensor != null) {
+            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+        }
+    }
+
+    private fun getSensor(type : String) : Sensor? {
+        val deviceSensors = sensorManager.getSensorList(Sensor.TYPE_ALL)
+        for ( sensor in deviceSensors) {
+            if (sensor.stringType == type) return sensor
+        }
+        return null
+    }
+
+    private fun showAvailableSensors() {
+        val deviceSensors = sensorManager.getSensorList(Sensor.TYPE_ALL)
+        deviceSensors.forEach {
+            Log.d("MainActivity", "${it.name} : ${it.stringType}")
+
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -99,5 +142,13 @@ class MainActivity : AppCompatActivity(), BottomBarFragment.OnMenuClicked,
 
     override fun onSelect(videogame: Videogame) {
         changeProductDetailFragment(videogame)
+    }
+
+    override fun onSensorChanged(sensorEvent: SensorEvent?) {
+        Log.d("MainActivity", sensorEvent!!.values[0].toString())
+    }
+
+    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
+
     }
 }
